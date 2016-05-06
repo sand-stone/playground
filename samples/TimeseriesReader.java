@@ -87,7 +87,7 @@ public class TimeseriesReader {
         List<String> projectColumns = new ArrayList<>(1);
         projectColumns.add("tsId");projectColumns.add("time");projectColumns.add("measure");
         ColumnRangePredicate pred=new ColumnRangePredicate(new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP).build());
-        pred.setLowerBound(1462502342877L);
+        pred.setLowerBound(1462506296918L);
         pred.setUpperBound(1562502342877L);
         KuduScanner scanner = client.newScannerBuilder(table)
           .setProjectedColumnNames(projectColumns)
