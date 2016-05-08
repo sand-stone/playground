@@ -17,6 +17,7 @@ public class TimeseriesGenerator {
     List<ColumnSchema> columns = new ArrayList();
     columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true).build());
+    columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("min",Type.DOUBLE).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("max",Type.DOUBLE).build());
@@ -24,7 +25,6 @@ public class TimeseriesGenerator {
     columns.add(new ColumnSchema.ColumnSchemaBuilder("count",Type.INT64).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8).build());
     columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).build());
     Schema schema = new Schema(columns);
     CreateTableOptions opt= new CreateTableOptions();
     List<String> hashcols=new ArrayList<String>();
@@ -34,7 +34,7 @@ public class TimeseriesGenerator {
     opt.addHashPartitions(hashcols,num);opt.setRangePartitionColumns(rangecols);
     for (int i=0;i<=12;i++) {
       PartialRow split=schema.newPartialRow();
-      split.addByte(2,(byte)i);
+      split.addByte(3,(byte)i);
       opt.addSplitRow(split);
     }
     client.createTable(tableName,schema,opt);
@@ -75,14 +75,14 @@ public class TimeseriesGenerator {
             Instant rts=now.plusMillis(rand.nextInt(interval)+rand.nextInt(interval));
             LocalDateTime ldt = LocalDateTime.ofInstant(rts,ZoneId.systemDefault());
             int mm=ldt.getMinute();
-            row.addByte(2,(byte)(mm/5));
-            row.addDouble(3,rand.nextDouble());
-            row.addDouble(4,rand.nextDouble()+1);
-            row.addDouble(5,rand.nextDouble()*10.0);
-            row.addLong(6,rand.nextInt(100));
-            row.addByte(7,(byte)mm);
-            row.addByte(8,(byte)ldt.getHour());
-            row.addLong(9,rts.toEpochMilli());
+            row.addLong(2,rts.toEpochMilli());
+            row.addByte(3,(byte)(mm/5));
+            row.addDouble(4,rand.nextDouble());
+            row.addDouble(5,rand.nextDouble()+1);
+            row.addDouble(6,rand.nextDouble()*10.0);
+            row.addLong(7,rand.nextInt(100));
+            row.addByte(8,(byte)mm);
+            row.addByte(9,(byte)ldt.getHour());
             session.apply(insert);
           }
           session.flush();
