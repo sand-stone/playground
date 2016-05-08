@@ -2,6 +2,7 @@ import java.io.*;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.kududb.*;
 import org.kududb.client.*;
@@ -68,7 +69,6 @@ public class TimeseriesGenerator {
         Random rand = new Random();long rcount=0;
         while(count-->0) {
           int batch=mcount;
-          long t1=System.nanoTime();
           while(batch-->0) {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
@@ -89,8 +89,7 @@ public class TimeseriesGenerator {
             session.apply(insert);
           }
           session.flush();
-          long t2=System.nanoTime();
-          timings[id]=t2-t1;
+          rows.addAndGet(mcount);
           //System.out.printf("insert %d rows in %f\n",mcount,(t2-t1)/1e9);
           //if(rcount%100000==0) System.out.println("row count="+rcount);
         }
@@ -100,8 +99,7 @@ public class TimeseriesGenerator {
       }
     }
   }
-
-  private static long[] timings;
+  private static AtomicLong rows= new AtomicLong(0);
   public static void main(String[] args) {
     System.out.println("-----------------------------------------------");
     System.out.println("Will try to connect to Kudu master at " + KUDU_MASTER);
@@ -116,7 +114,6 @@ public class TimeseriesGenerator {
         c=Integer.parseInt(args[1]);
       }
       createTable(nums);
-      timings=new long[c];
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
@@ -126,15 +123,10 @@ public class TimeseriesGenerator {
       }
       boolean s=false;
       do {
+        long rc1=rows.get();
         s=executor.awaitTermination(5000,TimeUnit.MILLISECONDS);
-        double sum=0;
-        for(double n: timings) {
-          if(n==0) {sum=0.0;break;}
-          sum+=n;
-        }
-        sum/=timings.length;
-        if(sum>0)
-          System.out.printf("insert rate %f per second\n",timings.length*mcount*1.0/(sum/1e9));
+        long rc2=rows.get();
+        System.out.printf("insert rate %f per second\n",(rc2-rc1)/5.0);
       } while(!s);
     } catch (Exception e) {
       e.printStackTrace();
