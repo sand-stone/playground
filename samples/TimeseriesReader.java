@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.joda.time.*;
 import org.kududb.*;
 import org.kududb.client.*;
 

@@ -1,8 +1,8 @@
 import java.io.*;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.joda.time.*;
 import org.kududb.*;
 import org.kududb.client.*;
 
@@ -55,7 +55,7 @@ public class TimeseriesGenerator {
         for(int i=0;i<500;i++) {
           timeseries.add(prefix+i); 
         }
-        long ts=DateTime.now().getMillis();
+        long ts=Instant.now().toEpochMilli();
         Random rand = new Random();
         while(count-->0) {
           int batch=2;
