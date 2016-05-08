@@ -126,7 +126,7 @@ public class TimeseriesGenerator {
         long rc1=rows.get();
         s=executor.awaitTermination(5000,TimeUnit.MILLISECONDS);
         long rc2=rows.get();
-        System.out.printf("insert rate %f per second\n",(rc2-rc1)/5.0);
+        System.out.printf("insert rate %f per second total rows %d \n",(rc2-rc1)/5.0,rc2);
       } while(!s);
     } catch (Exception e) {
       e.printStackTrace();
