@@ -126,12 +126,13 @@ public class TimeseriesGenerator {
       }
       boolean s=false;
       do {
-        s=executor.awaitTermination(3000,TimeUnit.MILLISECONDS);
+        s=executor.awaitTermination(5000,TimeUnit.MILLISECONDS);
         long sum=0;
         for(double n: timings) {
           sum+=n;
         }
-        System.out.printf("insert rate %f per second\n",timings.length*mcount/sum/1e9);
+        if(sum>0)
+          System.out.printf("insert rate %f per second\n",timings.length*mcount*1.0/sum/1e9);
       } while(!s);
     } catch (Exception e) {
       e.printStackTrace();
