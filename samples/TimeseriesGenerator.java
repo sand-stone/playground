@@ -41,7 +41,7 @@ public class TimeseriesGenerator {
     client.shutdown();
   }
 
-  static int tscount=5000000;static int mcount=3000;static int interval=60*60*1000;
+  static int tscount=20000000;static int mcount=3000;static int interval=60*60*1000;
   public static class InsertTask implements Runnable
   {
     @Override
@@ -57,22 +57,17 @@ public class TimeseriesGenerator {
         //session.setFlushInterval(10000);
         //session.setMutationBufferSpace(10000);
         //session.flush().join(50000);
-        long count=10;
-        List<String> timeseries = new ArrayList<String>();
-        String prefix=UUID.randomUUID().toString();
-        for(int i=0;i<500;i++) {
-          timeseries.add(prefix+i);
-        }
+        long count=tscount;
         Instant now=Instant.now();
-        Random rand = new Random();
+        Random rand = new Random();long rcount=0;
         while(count-->0) {
-          int batch=2;
+          int batch=mcount;
           while(batch-->0) {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
             row.addString(0,"host#"+rand.nextInt(tscount));
             row.addString(1,"measure#"+rand.nextInt(mcount));
-            Instant rts=now.plusMillis(rand.nextInt(interval)+rand.nextInt(interval));
+            Instant rts=now.plusMillis(rand.nextInt(interval));
             LocalDateTime ldt = LocalDateTime.ofInstant(rts,ZoneId.systemDefault());
             int mm=ldt.getMinute();
             row.addLong(2,rts.toEpochMilli());
@@ -83,11 +78,12 @@ public class TimeseriesGenerator {
             row.addLong(7,rand.nextInt(100));
             row.addByte(8,(byte)mm);
             row.addByte(9,(byte)ldt.getHour());
+            rcount++;
             session.apply(insert);
           }
           session.flush();
-          System.out.println("count="+count);
-          //if(count%1000==0) System.out.println("count="+count);
+          //System.out.println("count="+count);
+          if(rcount%100000==0) System.out.println("row count="+rcount);
         }
         client.shutdown();
       } catch (Exception e) {
@@ -111,13 +107,11 @@ public class TimeseriesGenerator {
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
-      for (int i=0; i<1;i++) {
+      for (int i=0; i<64;i++) {
         InsertTask task = new InsertTask();
         executor.execute(task);
       }
-      while(true)
-        Thread.currentThread().sleep(1);
-      //executor.shutdown();
+      executor.awaitTermination(-1,TimeUnit.MILLISECONDS);
     } catch (Exception e) {
       e.printStackTrace();
     }
