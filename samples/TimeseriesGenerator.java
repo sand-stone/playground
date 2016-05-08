@@ -32,6 +32,11 @@ public class TimeseriesGenerator {
     hashcols.add("host");hashcols.add("measure");
     rangecols.add("mm5");
     opt.addHashPartitions(hashcols,num);opt.setRangePartitionColumns(rangecols);
+    for (int i=0;i<=12;i++) {
+      PartialRow split=schema.newPartialRow();
+      split.addByte(2,(byte)i);
+      opt.addSplitRow(split);
+    }
     client.createTable(tableName,schema,opt);
     client.shutdown();
   }
