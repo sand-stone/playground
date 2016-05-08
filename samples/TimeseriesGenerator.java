@@ -44,6 +44,12 @@ public class TimeseriesGenerator {
   static int tscount=20000000;static int mcount=5000;static int interval=60*60*1000;
   public static class InsertTask implements Runnable
   {
+    int id;
+
+    public InsertTask(int id) {
+      this.id=id;
+    }
+
     @Override
     public void run()
     {
@@ -84,7 +90,8 @@ public class TimeseriesGenerator {
           }
           session.flush();
           long t2=System.nanoTime();
-          System.out.printf("insert %d rows in %f\n",mcount,(t2-t1)/1e9);
+          timings[id]=t2-t1;
+          //System.out.printf("insert %d rows in %f\n",mcount,(t2-t1)/1e9);
           //if(rcount%100000==0) System.out.println("row count="+rcount);
         }
         client.shutdown();
@@ -94,7 +101,7 @@ public class TimeseriesGenerator {
     }
   }
 
-  static LinkedBlockingQueue<String> q=new LinkedBlockingQueue<String>();
+  private static long[] timings;
   public static void main(String[] args) {
     System.out.println("-----------------------------------------------");
     System.out.println("Will try to connect to Kudu master at " + KUDU_MASTER);
@@ -109,14 +116,23 @@ public class TimeseriesGenerator {
         c=Integer.parseInt(args[1]);
       }
       createTable(nums);
+      timings=new long[c];
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
       for (int i=0; i<c;i++) {
-        InsertTask task = new InsertTask();
+        InsertTask task = new InsertTask(i);
         executor.execute(task);
       }
-      executor.awaitTermination(-1,TimeUnit.MILLISECONDS);
+      boolean s=false;
+      do {
+        s=executor.awaitTermination(3000,TimeUnit.MILLISECONDS);
+        long sum=0;
+        for(double n: timings) {
+          sum+=n;
+        }
+        System.out.printf("insert rate %f per second\n",timings.length*mcount/sum/1e9);
+      } while(!s);
     } catch (Exception e) {
       e.printStackTrace();
     }
