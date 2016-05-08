@@ -101,15 +101,18 @@ public class TimeseriesGenerator {
     System.out.println("Run with -DkuduMaster=myHost:port to override.");
     System.out.println("-----------------------------------------------");
     try {
-      int nums=1;
+      int nums=1;int c=1;
       if(args.length>0) {
         nums=Integer.parseInt(args[0]);
+      }
+      if(args.length>1) {
+        c=Integer.parseInt(args[1]);
       }
       createTable(nums);
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
-      for (int i=0; i<8;i++) {
+      for (int i=0; i<c;i++) {
         InsertTask task = new InsertTask();
         executor.execute(task);
       }
