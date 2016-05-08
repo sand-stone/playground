@@ -19,7 +19,8 @@ public class TimeseriesReader {
         KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
         KuduTable table=client.openTable(tableName);
         List<String> projectColumns = new ArrayList<>(1);
-        projectColumns.add("tsId");projectColumns.add("time");projectColumns.add("measure");
+        projectColumns.add("host");projectColumns.add("time");projectColumns.add("measure");
+        projectColumns.add("hh");projectColumns.add("mm");projectColumns.add("mm5");
         KuduScanner scanner = client.newScannerBuilder(table)
           .setProjectedColumnNames(projectColumns)
           .build();
@@ -29,9 +30,9 @@ public class TimeseriesReader {
           while (results.hasNext()) {
             RowResult result = results.next();
             rows++;
-            System.out.println(result.getString(0));
-            System.out.println(result.getLong(1));
-            System.out.println(result.getString(2));
+            System.out.printf("%s %d %s %d %d %d\n",result.getString(0),
+                              result.getLong(1),result.getString(2),
+                              result.getByte(3),result.getByte(4),result.getByte(5));
           }
         }
         client.shutdown();
@@ -51,7 +52,7 @@ public class TimeseriesReader {
         KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
         KuduTable table=client.openTable(tableName);
         List<String> projectColumns = new ArrayList<>(1);
-        projectColumns.add("tsId");projectColumns.add("time");projectColumns.add("measure");
+        projectColumns.add("host");projectColumns.add("time");projectColumns.add("measure");
         KuduScanner scanner = client.newScannerBuilder(table)
           .setProjectedColumnNames(projectColumns)
           .addPredicate(KuduPredicate.newComparisonPredicate(new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP).build(), KuduPredicate.ComparisonOp.EQUAL,1462502386629L))
@@ -84,10 +85,11 @@ public class TimeseriesReader {
         KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
         KuduTable table=client.openTable(tableName);
         List<String> projectColumns = new ArrayList<>(1);
-        projectColumns.add("tsId");projectColumns.add("time");projectColumns.add("measure");
-        ColumnRangePredicate pred=new ColumnRangePredicate(new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP).build());
-        pred.setLowerBound(1462506296918L);
-        pred.setUpperBound(1562502342877L);
+        projectColumns.add("host");projectColumns.add("measure");projectColumns.add("mm5");
+        projectColumns.add("hh");projectColumns.add("mm");projectColumns.add("time");
+        ColumnRangePredicate pred=new ColumnRangePredicate(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).build());
+        pred.setLowerBound((byte)0);
+        pred.setUpperBound((byte)12);
         KuduScanner scanner = client.newScannerBuilder(table)
           .setProjectedColumnNames(projectColumns)
           .addColumnRangePredicate(pred)
@@ -98,9 +100,9 @@ public class TimeseriesReader {
           while (results.hasNext()) {
             RowResult result = results.next();
             rows++;
-            System.out.println(result.getString(0));
-            System.out.println(result.getLong(1));
-            System.out.println(result.getString(2));
+            System.out.printf("%s %s %d %d %d %d\n",result.getString(0),
+                              result.getString(1),result.getByte(2),
+                              result.getByte(3),result.getByte(4),result.getLong(5));
           }
         }
         client.shutdown();
@@ -110,7 +112,7 @@ public class TimeseriesReader {
       }
     }
   }
-  
+
   static LinkedBlockingQueue<String> q=new LinkedBlockingQueue<String>();
 
   public static void main(String[] args) {
