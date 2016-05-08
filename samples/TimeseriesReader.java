@@ -52,10 +52,11 @@ public class TimeseriesReader {
         KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
         KuduTable table=client.openTable(tableName);
         List<String> projectColumns = new ArrayList<>(1);
-        projectColumns.add("host");projectColumns.add("time");projectColumns.add("measure");
+        projectColumns.add("host");projectColumns.add("measure");projectColumns.add("mm5");
+        projectColumns.add("hh");projectColumns.add("mm");projectColumns.add("time");
         KuduScanner scanner = client.newScannerBuilder(table)
           .setProjectedColumnNames(projectColumns)
-          .addPredicate(KuduPredicate.newComparisonPredicate(new ColumnSchema.ColumnSchemaBuilder("time", Type.TIMESTAMP).build(), KuduPredicate.ComparisonOp.EQUAL,1462502386629L))
+          .addPredicate(KuduPredicate.newComparisonPredicate(new ColumnSchema.ColumnSchemaBuilder("mm5", Type.INT8).build(), KuduPredicate.ComparisonOp.EQUAL,0))
           .build();
         long rows=0;
         while (scanner.hasMoreRows()) {
@@ -63,9 +64,9 @@ public class TimeseriesReader {
           while (results.hasNext()) {
             RowResult result = results.next();
             rows++;
-            System.out.println(result.getString(0));
-            System.out.println(result.getLong(1));
-            System.out.println(result.getString(2));
+            System.out.printf("%s %s %d %d %d %d\n",result.getString(0),
+                              result.getString(1),result.getByte(2),
+                              result.getByte(3),result.getByte(4),result.getLong(5));
           }
         }
         client.shutdown();
@@ -128,7 +129,8 @@ public class TimeseriesReader {
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(nums);
       for (int i=0;i<nums;i++) {
         //ReadTask task = new ReadTask();
-        Runnable task = new RangeReadTask();//PointReadTask();
+        //Runnable task = new RangeReadTask();
+        Runnable task = new PointReadTask();
         executor.execute(task);
       }
       executor.shutdown();
