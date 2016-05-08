@@ -84,7 +84,7 @@ public class TimeseriesGenerator {
           }
           session.flush();
           long t2=System.nanoTime();
-          System.out.printf("insert %d rows in %d\n",count,(t2-t1)/1e9);
+          System.out.printf("insert %d rows in %f\n",mcount,(t2-t1)/1e9);
           //if(rcount%100000==0) System.out.println("row count="+rcount);
         }
         client.shutdown();
