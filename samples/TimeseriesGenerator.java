@@ -41,7 +41,7 @@ public class TimeseriesGenerator {
     client.shutdown();
   }
 
-  static int tscount=20000000;static int mcount=3000;static int interval=60*60*1000;
+  static int tscount=20000000;static int mcount=5000;static int interval=60*60*1000;
   public static class InsertTask implements Runnable
   {
     @Override
@@ -62,6 +62,7 @@ public class TimeseriesGenerator {
         Random rand = new Random();long rcount=0;
         while(count-->0) {
           int batch=mcount;
+          long t1=System.nanoTime();
           while(batch-->0) {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
@@ -82,8 +83,9 @@ public class TimeseriesGenerator {
             session.apply(insert);
           }
           session.flush();
-          //System.out.println("count="+count);
-          if(rcount%100000==0) System.out.println("row count="+rcount);
+          long t2=System.nanoTime();
+          System.out.printf("insert %d rows in %d\n",count,(t2-t1)/1e9);
+          //if(rcount%100000==0) System.out.println("row count="+rcount);
         }
         client.shutdown();
       } catch (Exception e) {
@@ -107,7 +109,7 @@ public class TimeseriesGenerator {
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
-      for (int i=0; i<64;i++) {
+      for (int i=0; i<8;i++) {
         InsertTask task = new InsertTask();
         executor.execute(task);
       }
