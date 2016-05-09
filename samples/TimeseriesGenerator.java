@@ -18,7 +18,8 @@ public class TimeseriesGenerator {
     try {
       client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       List<ColumnSchema> columns = new ArrayList();
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true)
                   .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true)
