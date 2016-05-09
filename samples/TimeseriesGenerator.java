@@ -19,15 +19,24 @@ public class TimeseriesGenerator {
       client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       List<ColumnSchema> columns = new ArrayList();
       columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("min",Type.DOUBLE).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("max",Type.DOUBLE).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("sum",Type.DOUBLE).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("count",Type.INT64).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true)
+                  .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("min",Type.DOUBLE)
+                  .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("max",Type.DOUBLE)
+                  .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("sum",Type.DOUBLE)
+                  .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("count",Type.INT64)
+                  .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       Schema schema = new Schema(columns);
       CreateTableOptions opt= new CreateTableOptions();
       List<String> hashcols=new ArrayList<String>();
