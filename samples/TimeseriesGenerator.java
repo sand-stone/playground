@@ -48,7 +48,7 @@ public class TimeseriesGenerator {
     }
   }
 
-  static int tscount=2000000;static int mcount=6000;static int interval=60*60*1000;
+  static int tscount=100000;static int mcount=10000;static int interval=60*60*1000;
   public static class InsertTask implements Runnable
   {
     int id;
@@ -133,10 +133,9 @@ public class TimeseriesGenerator {
       }
       boolean s=false;
       do {
-        long rc1=rows.get();
-        s=executor.awaitTermination(5000,TimeUnit.MILLISECONDS);
-        long rc2=rows.get();
-        System.out.printf("insert rate %f per second total rows %d elapsed time %f\n",(rc2-rc1)/5.0,rc2,(System.nanoTime()-t1)/1e9);
+        s=executor.awaitTermination(3000,TimeUnit.MILLISECONDS);
+        long r=rows.get();double e=(System.nanoTime()-t1)/1e9;
+        System.out.printf("totla rows %d elapsed time %f insert rate %f per second \n",r,e,r/e);
       } while(!s);
       System.out.printf("elapsed %f total rows %d \n",(System.nanoTime()-t1)/1e9,rows.get());
     } catch (Exception e) {
