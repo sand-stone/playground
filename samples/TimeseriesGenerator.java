@@ -14,32 +14,38 @@ public class TimeseriesGenerator {
 
   private static void createTable(int num) throws Exception
   {
-    KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
-    List<ColumnSchema> columns = new ArrayList();
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("min",Type.DOUBLE).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("max",Type.DOUBLE).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("sum",Type.DOUBLE).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("count",Type.INT64).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8).build());
-    columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8).build());
-    Schema schema = new Schema(columns);
-    CreateTableOptions opt= new CreateTableOptions();
-    List<String> hashcols=new ArrayList<String>();
-    List<String> rangecols=new ArrayList<String>();
-    hashcols.add("host");hashcols.add("measure");
-    rangecols.add("mm5");
-    opt.addHashPartitions(hashcols,num);opt.setRangePartitionColumns(rangecols);
-    for (int i=0;i<=12;i++) {
-      PartialRow split=schema.newPartialRow();
-      split.addByte(3,(byte)i);
-      opt.addSplitRow(split);
+    KuduClient client=null;
+    try {
+      client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
+      List<ColumnSchema> columns = new ArrayList();
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("host",Type.STRING).key(true).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("min",Type.DOUBLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("max",Type.DOUBLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("sum",Type.DOUBLE).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("count",Type.INT64).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8).build());
+      Schema schema = new Schema(columns);
+      CreateTableOptions opt= new CreateTableOptions();
+      List<String> hashcols=new ArrayList<String>();
+      List<String> rangecols=new ArrayList<String>();
+      hashcols.add("host");hashcols.add("measure");
+      rangecols.add("mm5");
+      opt.addHashPartitions(hashcols,num);opt.setRangePartitionColumns(rangecols);
+      for (int i=0;i<=12;i++) {
+        PartialRow split=schema.newPartialRow();
+        split.addByte(3,(byte)i);
+        opt.addSplitRow(split);
+      }
+      client.createTable(tableName,schema,opt);
+    } catch(MasterErrorException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if(client!=null) client.shutdown();
     }
-    client.createTable(tableName,schema,opt);
-    client.shutdown();
   }
 
   static int tscount=20000000;static int mcount=5000;static int interval=60*60*1000;
