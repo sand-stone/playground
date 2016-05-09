@@ -143,7 +143,7 @@ public class TimeseriesGenerator {
       }
       boolean s=false;
       do {
-        s=executor.awaitTermination(3000,TimeUnit.MILLISECONDS);
+        s=executor.awaitTermination(10000,TimeUnit.MILLISECONDS);
         long r=rows.get();double e=(System.nanoTime()-t1)/1e9;
         System.out.printf("totla rows %d elapsed time %f insert rate %f per second \n",r,e,r/e);
       } while(!s);
