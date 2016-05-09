@@ -48,7 +48,7 @@ public class TimeseriesGenerator {
     }
   }
 
-  static int tscount=20000000;static int mcount=5000;static int interval=60*60*1000;
+  static int tscount=2000000;static int mcount=6000;static int interval=60*60*1000;
   public static class InsertTask implements Runnable
   {
     int id;
@@ -70,6 +70,9 @@ public class TimeseriesGenerator {
         //session.setFlushInterval(10000);
         //session.setMutationBufferSpace(10000);
         //session.flush().join(50000);
+        //session.setFlushInterval(100);
+        session.setFlushInterval(1000);
+        session.setMutationBufferSpace(1000000);
         long count=tscount;
         Instant now=Instant.now();
         Random rand = new Random();long rcount=0;
@@ -123,6 +126,7 @@ public class TimeseriesGenerator {
       //KuduClient client = new KuduClient.KuduClientBuilder(KUDU_MASTER).build();
       //client.deleteTable(tableName);
       ThreadPoolExecutor executor=(ThreadPoolExecutor)Executors.newFixedThreadPool(64);
+      long t1=System.nanoTime();
       for (int i=0; i<c;i++) {
         InsertTask task = new InsertTask(i);
         executor.execute(task);
@@ -132,8 +136,9 @@ public class TimeseriesGenerator {
         long rc1=rows.get();
         s=executor.awaitTermination(5000,TimeUnit.MILLISECONDS);
         long rc2=rows.get();
-        System.out.printf("insert rate %f per second total rows %d \n",(rc2-rc1)/5.0,rc2);
+        System.out.printf("insert rate %f per second total rows %d elapsed time %f\n",(rc2-rc1)/5.0,rc2,(System.nanoTime()-t1)/1e9);
       } while(!s);
+      System.out.printf("elapsed %f total rows %d \n",(System.nanoTime()-t1)/1e9,rows.get());
     } catch (Exception e) {
       e.printStackTrace();
     }
