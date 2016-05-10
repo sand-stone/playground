@@ -1,5 +1,5 @@
 import os,subprocess
-num=72
+num=48
 dirs=[]
 for i in range(0,num):
     dirs.append('/mnt/db/data'+`i`)

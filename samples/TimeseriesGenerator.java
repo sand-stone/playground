@@ -22,6 +22,8 @@ public class TimeseriesGenerator {
                   .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("measure",Type.STRING).key(true)
                   .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
+      columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8).key(true)
+                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("time",Type.TIMESTAMP).key(true)
                   .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("mm5",Type.INT8).key(true)
@@ -36,18 +38,16 @@ public class TimeseriesGenerator {
                   .encoding(ColumnSchema.Encoding.BIT_SHUFFLE).build());
       columns.add(new ColumnSchema.ColumnSchemaBuilder("mm",Type.INT8)
                   .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
-      columns.add(new ColumnSchema.ColumnSchemaBuilder("hh",Type.INT8)
-                  .encoding(ColumnSchema.Encoding.DICT_ENCODING).build());
       Schema schema = new Schema(columns);
       CreateTableOptions opt= new CreateTableOptions();
       List<String> hashcols=new ArrayList<String>();
       List<String> rangecols=new ArrayList<String>();
-      hashcols.add("host");hashcols.add("measure");
+      hashcols.add("host");hashcols.add("measure");hashcols.add("hh");
       rangecols.add("mm5");
       opt.addHashPartitions(hashcols,num);opt.setRangePartitionColumns(rangecols);
       for (int i=0;i<=12;i++) {
         PartialRow split=schema.newPartialRow();
-        split.addByte(3,(byte)i);
+        split.addByte(4,(byte)i);
         opt.addSplitRow(split);
       }
       client.createTable(tableName,schema,opt);
@@ -58,7 +58,7 @@ public class TimeseriesGenerator {
     }
   }
 
-  static int tscount=100000;static int mcount=10000;static int interval=60*60*1000;
+  static int tscount=20000000;static int mcount=10000;static int interval=60*24*7;
   public static class InsertTask implements Runnable
   {
     int id;
@@ -82,28 +82,29 @@ public class TimeseriesGenerator {
         //session.flush().join(50000);
         //session.setFlushInterval(100);
         session.setFlushInterval(1000);
-        session.setMutationBufferSpace(1000000);
-        long count=tscount;
+        session.setMutationBufferSpace(2000000);
+        long count=interval;
         Instant now=Instant.now();
         Random rand = new Random();long rcount=0;
+        String prefix="host#"+id;
         while(count-->0) {
           int batch=mcount;
           while(batch-->0) {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
-            row.addString(0,"host#"+rand.nextInt(tscount));
+            row.addString(0,prefix+rand.nextInt(tscount));
             row.addString(1,"measure#"+rand.nextInt(mcount));
             Instant rts=now.plusMillis(rand.nextInt(interval));
             LocalDateTime ldt = LocalDateTime.ofInstant(rts,ZoneId.systemDefault());
             int mm=ldt.getMinute();
-            row.addLong(2,rts.toEpochMilli());
-            row.addByte(3,(byte)(mm/5));
-            row.addDouble(4,rand.nextDouble());
-            row.addDouble(5,rand.nextDouble()+1);
-            row.addDouble(6,rand.nextDouble()*10.0);
-            row.addLong(7,rand.nextInt(100));
-            row.addByte(8,(byte)mm);
-            row.addByte(9,(byte)ldt.getHour());
+            row.addByte(2,(byte)ldt.getHour());
+            row.addLong(3,rts.toEpochMilli());
+            row.addByte(4,(byte)(mm/5));
+            row.addDouble(5,rand.nextDouble());
+            row.addDouble(6,rand.nextDouble()+1);
+            row.addDouble(7,rand.nextDouble()*10.0);
+            row.addLong(8,rand.nextInt(100));
+            row.addByte(9,(byte)mm);
             rcount++;
             session.apply(insert);
           }
