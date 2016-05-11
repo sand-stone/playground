@@ -84,18 +84,17 @@ public class TimeseriesGenerator {
         session.setFlushInterval(1000);
         session.setMutationBufferSpace(2000000);
         long count=interval;
-        Instant now=Instant.now();
         Random rand = new Random();long rcount=0;
         String prefix="host#"+id;
         while(count-->0) {
           int batch=mcount;
+          Instant now=Instant.now();
+          LocalDateTime ldt = LocalDateTime.ofInstant(now,ZoneId.systemDefault());
           while(batch-->0) {
             Insert insert = table.newInsert();
             PartialRow row = insert.getRow();
             row.addString(0,prefix+rand.nextInt(tscount));
             row.addString(1,"measure#"+rand.nextInt(mcount));
-            Instant rts=now.plusMillis(rand.nextInt(interval));
-            LocalDateTime ldt = LocalDateTime.ofInstant(rts,ZoneId.systemDefault());
             int mm=ldt.getMinute();
             row.addByte(2,(byte)ldt.getHour());
             row.addLong(3,rts.toEpochMilli());
