@@ -97,7 +97,7 @@ public class TimeseriesGenerator {
             row.addString(1,"measure#"+rand.nextInt(mcount));
             int mm=ldt.getMinute();
             row.addByte(2,(byte)ldt.getHour());
-            row.addLong(3,rts.toEpochMilli());
+            row.addLong(3,now.toEpochMilli());
             row.addByte(4,(byte)(mm/5));
             row.addDouble(5,rand.nextDouble());
             row.addDouble(6,rand.nextDouble()+1);
