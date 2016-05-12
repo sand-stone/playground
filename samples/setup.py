@@ -1,10 +1,10 @@
 import os,subprocess
 num=48
-waldirs=['/mnt/db/wal/master']
-datadirs=['/mnt/db/data/ts0']
+waldirs=[]
+datadirs=[]
 for i in range(0,num):
-    waldirs.append('/mnt/db/wal/ts'+`i`)
-    datadirs.append('/mnt/db/data/ts'+`i`)
+    waldirs.append('/mnt/db/wal/'+`i`)
+    datadirs.append('/mnt/db/data/'+`i`)
 for d in waldirs:
     os.system("rm -rf "+d)
     os.system("mkdir -p"+d)
