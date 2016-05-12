@@ -1,0 +1,151 @@
+{
+  "autosize": false, 
+  "bargap": 0.2, 
+  "bargroupgap": 0, 
+  "barmode": "stack", 
+  "boxgap": 0.3, 
+  "boxgroupgap": 0.3, 
+  "boxmode": "overlay", 
+  "dragmode": "zoom", 
+  "font": {
+    "color": "rgb(33, 33, 33)", 
+    "family": "Raleway, sans-serif", 
+    "size": 12
+  }, 
+  "height": 500, 
+  "hidesources": false, 
+  "hovermode": "x", 
+  "legend": {
+    "x": 0.0163265306122449, 
+    "y": 0.9, 
+    "bgcolor": "rgba(255, 255, 255, 0)", 
+    "bordercolor": "#000", 
+    "borderwidth": 1, 
+    "font": {
+      "color": "", 
+      "family": "", 
+      "size": 0
+    }, 
+    "traceorder": "reversed", 
+    "xanchor": "auto", 
+    "yanchor": "auto"
+  }, 
+  "margin": {
+    "r": 80, 
+    "t": 100, 
+    "autoexpand": true, 
+    "b": 80, 
+    "l": 80, 
+    "pad": 0
+  }, 
+  "paper_bgcolor": "#fff", 
+  "plot_bgcolor": "rgb(255, 255, 255)", 
+  "separators": ".,", 
+  "showlegend": true, 
+  "smith": false, 
+  "title": "<br>Time Series Data <br><i>metrics</i>", 
+  "titlefont": {
+    "color": "", 
+    "family": "", 
+    "size": 0
+  }, 
+  "width": 650, 
+  "xaxis": {
+    "anchor": "y", 
+    "autorange": false, 
+    "autotick": true, 
+    "domain": [
+      0, 
+      1
+    ], 
+    "dtick": "M12.000000000000002", 
+    "exponentformat": "e", 
+    "gridcolor": "#ddd", 
+    "gridwidth": 1, 
+    "linecolor": "#000", 
+    "linewidth": 1, 
+    "mirror": false, 
+    "nticks": 14, 
+    "overlaying": false, 
+    "position": 0, 
+    "range": [
+      949381200000, 
+      1325307600000
+    ], 
+    "rangemode": "normal", 
+    "showexponent": "all", 
+    "showgrid": false, 
+    "showline": true, 
+    "showticklabels": true, 
+    "tick0": 946702800000, 
+    "tickangle": "auto", 
+    "tickcolor": "#000", 
+    "tickfont": {
+      "color": "", 
+      "family": "", 
+      "size": 0
+    }, 
+    "ticklen": 3, 
+    "ticks": "inside", 
+    "tickwidth": 1, 
+    "title": "<i>Source: metrics 1</i>", 
+    "titlefont": {
+      "color": "", 
+      "family": "", 
+      "size": 0
+    }, 
+    "type": "date", 
+    "zeroline": true, 
+    "zerolinecolor": "#000", 
+    "zerolinewidth": 1
+  }, 
+  "yaxis": {
+    "anchor": "x", 
+    "autorange": false, 
+    "autotick": true, 
+    "domain": [
+      0, 
+      1
+    ], 
+    "dtick": 5, 
+    "exponentformat": "e", 
+    "gridcolor": "#ddd", 
+    "gridwidth": 1, 
+    "linecolor": "#000", 
+    "linewidth": 1, 
+    "mirror": false, 
+    "nticks": 0, 
+    "overlaying": false, 
+    "position": 0, 
+    "range": [
+        -1.404176762432213, 
+      27
+    ], 
+    "rangemode": "normal", 
+    "showexponent": "all", 
+    "showgrid": true, 
+    "showline": true, 
+    "showticklabels": true, 
+    "tick0": 0, 
+    "tickangle": "auto", 
+    "tickcolor": "#000", 
+    "tickfont": {
+      "color": "", 
+      "family": "", 
+      "size": 0
+    }, 
+    "ticklen": 5, 
+    "ticks": "", 
+    "tickwidth": 1, 
+    "title": "average change", 
+    "titlefont": {
+      "color": "", 
+      "family": "", 
+      "size": 0
+    }, 
+    "type": "linear", 
+    "zeroline": false, 
+    "zerolinecolor": "#000", 
+    "zerolinewidth": 1
+  }
+}
