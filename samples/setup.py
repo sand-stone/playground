@@ -1,14 +1,16 @@
 import os,subprocess
 num=48
-dirs=[]
+waldirs=['/mnt/db/wal/master']
+datadirs=['/mnt/db/data/ts0']
 for i in range(0,num):
-    dirs.append('/mnt/db/data'+`i`)
+    waldirs.append('/mnt/db/wal/ts'+`i`)
+    datadirs.append('/mnt/db/data/ts'+`i`)
 for d in dirs:
     os.system("rm -rf "+d)
-    os.system("mkdir "+d)
+    os.system("mkdir -p"+d)
 cmds=[]
 c=['./bin/kudu-master','--use_hybrid_clock=false','--cfile_do_on_finish=flush','--flush_threshold_mb=5000','-rpc_num_service_threads=24','-num_reactor_threads=12', '-default_num_replicas=1','--logtostderr','-fs_wal_dir=']
-c[-1]=c[-1]+dirs[0]
+c[-1]=c[-1]+waldirs[0]
 cmds.append(c)
 p1=7052
 p2=8052
@@ -26,7 +28,8 @@ for i in range(1,num):
     t.append('-rpc_num_service_threads=24')
     t.append('-num_reactor_threads=12')
     t.append('--logtostderr')
-    t.append('-fs_wal_dir='+dirs[i])
+    t.append('-fs_data_dirs='+datadirs[i])
+    t.append('-fs_wal_dir='+waldirs[i])
     cmds.append(t)
 procs=[]
 for c in cmds:
