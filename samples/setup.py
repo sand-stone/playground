@@ -5,9 +5,12 @@ datadirs=['/mnt/db/data/ts0']
 for i in range(0,num):
     waldirs.append('/mnt/db/wal/ts'+`i`)
     datadirs.append('/mnt/db/data/ts'+`i`)
-for d in dirs:
+for d in waldirs:
     os.system("rm -rf "+d)
     os.system("mkdir -p"+d)
+for d in datadirs:
+    os.system("rm -rf "+d)
+    os.system("mkdir -p"+d)    
 cmds=[]
 c=['./bin/kudu-master','--use_hybrid_clock=false','--cfile_do_on_finish=flush','--flush_threshold_mb=5000','-rpc_num_service_threads=24','-num_reactor_threads=12', '-default_num_replicas=1','--logtostderr','-fs_wal_dir=']
 c[-1]=c[-1]+waldirs[0]
